@@ -2,6 +2,7 @@
 # Copyright(c) 2010-2016 Intel Corporation
 
 #include "common_base"
+#include "common_base_custom"
 
 CONFIG_RTE_EXEC_ENV="linuxapp"
 CONFIG_RTE_EXEC_ENV_LINUX=y
