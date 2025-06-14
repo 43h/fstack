@@ -362,7 +362,7 @@ for my $opt (@ARGV) {
         $ngx_sbin = $1;
         push @ngx_opts, $opt;
 
-	} elsif ($opt =~ /^--ff-path=(.*)/) {
+    } elsif ($opt =~ /^--ff-path=(.*)/) {
         $ff_path = $1;
 
     } elsif ($opt =~ /^--ff-dpdk=(.*)/) {
