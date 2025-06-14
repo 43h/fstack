@@ -14,11 +14,15 @@ S=${TOPDIR}/freebsd
 MACHINE_INCLUDES_ROOT:=${CURDIR}/machine_include
 OVERRIDE_INCLUDES_ROOT:=${CURDIR}/include
 X86_INCLUDES=0
+ifdef FF_PREFIX
+PREFIX=$(FF_PREFIX)
+else
 PREFIX=/usr/local
-PREFIX_LIB=${PREFIX}/lib
-PREFIX_INCLUDE=/usr/local/include
-PREFIX_BIN=/usr/local/bin
-F-STACK_CONF=/etc/f-stack.conf
+endif
+PREFIX_LIB=$(PREFIX)/lib
+PREFIX_INCLUDE=$(PREFIX)/include
+PREFIX_BIN=$(PREFIX)/bin
+F-STACK_CONF=$(PREFIX)/etc/f-stack.conf
 F-STACK_VERSION=1.21
 TGT_OS=$(shell uname)
 ifeq ($(TGT_OS),FreeBSD)
