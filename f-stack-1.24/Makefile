@@ -78,6 +78,21 @@ sdk-clean:
 
 cleanall: dpdk-clean ff-clean nginx-clean op-clean sdk-clean
 
+
+help:
+	@echo "Makefile for F-Stack"
+	@echo "step 1: compile DPDK"
+	@echo "  make dpdk-config"
+	@echo "  make dpdk-build"
+	@echo "  make dpdk-install"
+	@echo "step 2: compile F-Stack lib"
+	@echo "  make ff-build"
+	@echo "  make ff-install"
+	@echo "step 3: compile Openresty"
+	@echo "  make op-config"
+	@echo "  make op-build"
+	@echo "  make op-install"
+
 #     cd f-stack
 #     # Compile DPDK
 #     cd dpdk/usertools
