@@ -31,7 +31,11 @@ kerneldir   ?= $(RTE_KERNELDIR:/build=/extra/dpdk)
 else
 kerneldir   ?= /boot/modules
 endif
-prefix      ?=     /usr/local
+ifdef PREFIX
+prefix      ?= $(PREFIX)
+else
+prefix      ?= /usr/local
+endif
 endif
 exec_prefix ?=      $(prefix)
 bindir      ?= $(exec_prefix)/bin
