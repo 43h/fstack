@@ -31,7 +31,7 @@ ngx_udp_unix_sendmsg_chain(ngx_connection_t *c, ngx_chain_t *in, off_t limit)
         return in;
     }
 
-#if (NGX_HAVE_KQUEUE)
+#if (NGX_HAVE_KQUEUE) || (NGX_HAVE_FSTACK)
 
     if ((ngx_event_flags & NGX_USE_KQUEUE_EVENT) && wev->pending_eof) {
         (void) ngx_connection_error(c, wev->kq_errno,
@@ -277,7 +277,7 @@ ngx_set_srcaddr_cmsg(struct cmsghdr *cmsg, struct sockaddr *local_sockaddr)
         addr = (struct in_addr *) CMSG_DATA(cmsg);
         *addr = sin->sin_addr;
 
-#elif (NGX_HAVE_IP_PKTINFO)
+#elif (NGX_HAVE_IP_PKTINFO) && (!NGX_HAVE_FSTACK)
 
         cmsg->cmsg_type = IP_PKTINFO;
         cmsg->cmsg_len = CMSG_LEN(sizeof(struct in_pktinfo));
@@ -295,7 +295,7 @@ ngx_set_srcaddr_cmsg(struct cmsghdr *cmsg, struct sockaddr *local_sockaddr)
 
 #endif
 
-#if (NGX_HAVE_INET6 && NGX_HAVE_IPV6_RECVPKTINFO)
+#if (NGX_HAVE_INET6 && NGX_HAVE_IPV6_RECVPKTINFO && !NGX_HAVE_FSTACK)
     if (local_sockaddr->sa_family == AF_INET6) {
 
         cmsg->cmsg_level = IPPROTO_IPV6;

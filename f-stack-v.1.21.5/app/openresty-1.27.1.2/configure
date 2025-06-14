@@ -135,6 +135,8 @@ my $user_luajit_xcflags;
 my $user_luajit_ldflags;
 my $no_luajit_lua52;
 my $no_luajit_gc64;
+my $ff_path;
+my $ff_dpdk;
 
 my (@ngx_opts, @ngx_cc_opts, @ngx_ld_opts);
 
@@ -360,6 +362,12 @@ for my $opt (@ARGV) {
         $ngx_sbin = $1;
         push @ngx_opts, $opt;
 
+	} elsif ($opt =~ /^--ff-path=(.*)/) {
+        $ff_path = $1;
+
+    } elsif ($opt =~ /^--ff-dpdk=(.*)/) {
+        $ff_dpdk = $1;
+
     } elsif ($opt =~ /^--\w.*/) {
         push @ngx_opts, $opt;
 
@@ -414,7 +422,7 @@ if (@ngx_ld_opts) {
     $ld_opts = " \\\n  --with-ld-opt='@ngx_ld_opts'";
 }
 
-my $cmd = "sh ./configure --prefix=$ngx_prefix"
+my $cmd = "FF_PATH=$ff_path FF_DPDK=$ff_dpdk sh ./configure --prefix=$ngx_prefix"
     . $resty_opts
     . $ld_opts
     . (@ngx_opts ? " \\\n  " . quote_cli_args(\@ngx_opts) : "");
@@ -1265,7 +1273,8 @@ sub usage ($) {
   --with-no-pool-patch               enable the no-pool patch for debugging memory issues
 
   -jN                                pass -jN option to make while building LuaJIT 2.1
-
+  --ff-path                          specify f-stack sdk path
+  --ff-dpdk                          specify dpdk mode
 _EOC_
 
     my $opt_max_len = length "  --without-ngx_devel_kit_module     ";

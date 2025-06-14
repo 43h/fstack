@@ -79,7 +79,7 @@ struct ngx_event_s {
 
     unsigned         cancelable:1;
 
-#if (NGX_HAVE_KQUEUE)
+#if (NGX_HAVE_KQUEUE) || (NGX_HAVE_FSTACK)
     unsigned         kq_vnode:1;
 
     /* the pending errno reported by kqueue */
@@ -101,7 +101,11 @@ struct ngx_event_s {
      *   read:       bytes to read when event is ready, -1 if not known
      */
 
+#if (NGX_HAVE_KQUEUE) || (NGX_HAVE_IOCP) || (NGX_HAVE_FSTACK)
     int              available;
+#else
+    unsigned         available:1;
+#endif
 
     ngx_event_handler_pt  handler;
 
@@ -137,6 +141,10 @@ struct ngx_event_s {
 
     uint32_t         padding[NGX_EVENT_T_PADDING];
 #endif
+#endif
+
+#if (NGX_HAVE_FSTACK)
+    unsigned        belong_to_host:1;
 #endif
 };
 
@@ -189,6 +197,9 @@ typedef struct {
 extern ngx_event_actions_t   ngx_event_actions;
 #if (NGX_HAVE_EPOLLRDHUP)
 extern ngx_uint_t            ngx_use_epoll_rdhup;
+#endif
+#if (NGX_HAVE_FSTACK)
+extern ngx_event_actions_t   ngx_ff_host_event_actions;
 #endif
 
 
@@ -305,7 +316,7 @@ extern ngx_uint_t            ngx_use_epoll_rdhup;
 #endif
 
 
-#if (NGX_HAVE_KQUEUE)
+#if (NGX_HAVE_KQUEUE) || (NGX_HAVE_FSTACK)
 
 #define NGX_READ_EVENT     EVFILT_READ
 #define NGX_WRITE_EVENT    EVFILT_WRITE
@@ -399,6 +410,49 @@ extern ngx_uint_t            ngx_use_epoll_rdhup;
 #define NGX_CLEAR_EVENT    0    /* dummy declaration */
 #endif
 
+#if (NGX_HAVE_FSTACK)
+
+static inline ngx_int_t
+ngx_add_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags) {
+    if (1 == ev->belong_to_host) {
+        return ngx_ff_host_event_actions.add(ev, event, flags);
+    } else {
+        return ngx_event_actions.add(ev, event, flags);
+    }
+}
+
+static inline ngx_int_t
+ngx_del_event(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags) {
+    if (1 == ev->belong_to_host) {
+        return ngx_ff_host_event_actions.del(ev, event, flags);
+    } else {
+        return ngx_event_actions.del(ev, event, flags);
+    }
+}
+
+static inline ngx_int_t ngx_add_conn(ngx_connection_t *c)
+{
+    return ngx_event_actions.add_conn(c);
+}
+
+static inline ngx_int_t ngx_del_conn(
+    ngx_connection_t *c, ngx_uint_t flags) {
+    return ngx_event_actions.del_conn(c, flags);
+}
+
+static inline ngx_int_t ngx_notify(ngx_event_handler_pt handler) {
+    return ngx_event_actions.notify(handler);
+}
+
+static inline ngx_int_t ngx_process_events(
+    ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags)
+{
+    return ngx_event_actions.process_events(cycle, timer, flags);
+}
+
+#define ngx_ff_process_host_events   ngx_ff_host_event_actions.process_events
+
+#else
 
 #define ngx_process_events   ngx_event_actions.process_events
 #define ngx_done_events      ngx_event_actions.done
@@ -409,6 +463,8 @@ extern ngx_uint_t            ngx_use_epoll_rdhup;
 #define ngx_del_conn         ngx_event_actions.del_conn
 
 #define ngx_notify           ngx_event_actions.notify
+
+#endif /* NGX_HAVE_FSTACK */
 
 #define ngx_add_timer        ngx_event_add_timer
 #define ngx_del_timer        ngx_event_del_timer
