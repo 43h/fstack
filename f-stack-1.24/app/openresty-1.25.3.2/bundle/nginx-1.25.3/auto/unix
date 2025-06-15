@@ -1070,15 +1070,15 @@ ngx_feature_test="int fd;
                   fd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);"
 . auto/feature
 
-ngx_feature="FD_CLOEXEC support"
-ngx_feature_name="NGX_HAVE_FD_CLOEXEC"
-ngx_feature_run=no
-ngx_feature_incs="#include <sys/types.h>
-                  #include <sys/socket.h>
-                  #include <fcntl.h>"
-ngx_feature_path=
-ngx_feature_libs=
-ngx_feature_test="int fd;
-                  fd = socket(AF_INET, SOCK_STREAM, 0);
-                  fcntl(fd, F_SETFD, FD_CLOEXEC);"
-. auto/feature
+# ngx_feature="FD_CLOEXEC support"
+# ngx_feature_name="NGX_HAVE_FD_CLOEXEC"
+# ngx_feature_run=no
+# ngx_feature_incs="#include <sys/types.h>
+#                   #include <sys/socket.h>
+#                   #include <fcntl.h>"
+# ngx_feature_path=
+# ngx_feature_libs=
+# ngx_feature_test="int fd;
+#                   fd = socket(AF_INET, SOCK_STREAM, 0);
+#                   fcntl(fd, F_SETFD, FD_CLOEXEC);"
+# . auto/feature
